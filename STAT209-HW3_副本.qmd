@@ -1,0 +1,169 @@
+---
+title: "STAT209 HW3 - Spring 2025"
+author:
+- name: _INSERT_YOUR_NAME_, YOUR_EMAIL_
+format: pdf
+---
+
+## **Homework #3 instructions**
+
+1. **Review [R4DS textbook Chapter 5 "Data transformation"](https://r4ds.had.co.nz/transform.html) and [Chapter 7 "Exploratory Data Analysis"](https://r4ds.had.co.nz/exploratory-data-analysis.html), as well as lecture notes on `dplyr` and EDA before answering the homework questions**.
+
+2. Replace **INSERT_YOUR_ANSWER** with your own answers.
+
+3. For this homework, use **ggplot2** and **dplyr** to visualize and transform your data.
+
+4. If the question asks you to write some R code, remember to put your code into a **R code chunk**. Make sure both your R code chunk and its output are visible in the rendered `pdf` file.
+
+5. Please comment your R code thoroughly. Please follow the R coding style guidelines [https://google.github.io/styleguide/Rguide.xml](https://google.github.io/styleguide/Rguide.xml) or [https://style.tidyverse.org/](https://style.tidyverse.org/). 
+**Partial credit will be deducted for insufficient commenting or poor coding styles.**
+
+6. If you use AI, please clearly explain how you used it in the **Acknowledgments** section. If you have any questions, please post them on [**Canvas**](https://elearn.ucr.edu/courses/182094/discussion_topics/734666) so that everyone can benefit from the discussion.
+
+
+
+### **Homework submission guideline**
+
+- **This homework is DUE at _11:59 PM_ on _Wednesday May 7, 2025_**.
+
+- **NO** late submissions will be accepted unless you receive prior approval at least 24 hours before the deadline.
+
+- After you complete all questions, save your `qmd` file to `FirstnameLastname-SID-HW3.qmd` and save the rendered `pdf` file to `FirstnameLastname-SID-HW3.pdf`.
+
+- Submit **BOTH your source `qmd` file and the knitted `pdf` file** to **GradeScope**. 
+
+
+***
+
+## **Acknowledgments**
+
+Please list all the help you have received for completing this homework.
+
+**INSERT_YOUR_ANSWER**
+
+***
+
+**Install necessary packages**
+
+Note that you only need to install each package once. Then you can comment out the following installation lines.
+
+```{r, collapse=T}
+#install.packages("tidyverse")
+#install.packages("nycflights13")
+```
+
+**Load necessary packages**
+
+```{r, collapse=T}
+library(tidyverse)
+library(nycflights13) # for the `nycflights13` data
+```
+
+***
+
+## The `nycflights13` data
+
+In this homework, we will focus on the `nycflights13::flights` data set which contains all 336,776 flights that departed from New York City in 2013. 
+
+Reference manual: [nycflights13.pdf](https://cran.r-project.org/web/packages/nycflights13/nycflights13.pdf)
+
+```{r, collapse=T}
+?flights # full documentation of `flights` table
+glimpse(flights)
+```
+
+In addition to the `flights` data set, there are four other data sets as listed below. The relationship among the five data tables are shown in the diagram at [http://r4ds.had.co.nz/diagrams/relational-nycflights.png](http://r4ds.had.co.nz/diagrams/relational-nycflights.png).
+
+```{r, collapse=T}
+?airports # full documentation of `airports` table
+glimpse(airports)
+
+?planes # full documentation of `planes` table
+glimpse(planes)
+
+?weather # full documentation of `weather` table
+glimpse(weather)
+
+?airlines # full documentation of `airlines` table
+glimpse(airlines)
+```
+
+***
+
+## **Question 1 Flight dates and times**
+
+There are some missing values in the data set which were caused by **canceled flights**. We can clean the `flights` data by removing flight record that has missing values in `dep_delay` or `arr_delay`, and save the **non-canceled** flights in a new tibble `not_canceled`.
+
+```{r, collapse=T}
+(not_canceled <- filter(flights, !is.na(dep_delay), !is.na(arr_delay)))
+```  
+
+(i) For the **non-canceled** flights, use the `mutate()` function to create a new variable `flight_time` which equals `arr_time` - `dep_time`. Make a scatter plot to compare `flight_time` with `air_time`.
+
+**INSERT_YOUR_ANSWER**
+
+(ii) What do you expect to see? What do you see? Why are there negative values in `flight_time`?
+
+**INSERT_YOUR_ANSWER**
+
+(iii) Fix your R code to correct the negative values in `flight_time`. Make the scatter plot again. 
+
+**Hint:** The `lubridate` package would be helpful. Check out our textbook **[Chapter 16 "Dates and times"](http://r4ds.had.co.nz/dates-and-times.html)**
+
+**INSERT_YOUR_ANSWER**
+
+(iv) You have probably wondered why your scatter plot didn't have a clear linear relationship. The reasons were due to the time zone differences as well as the daylight saving time (DST). Modify your R code to solve these issues. 
+
+**Hint:** Check out the `airports` data set. You can _join_ `flights` and `airports` using destination airport FAA code as the _key_.
+
+**INSERT_YOUR_ANSWER**
+
+***
+
+## **Question 2 Daily flight cancellation rate**
+
+(i) Suppose we are interested in studying the number of canceled flights per day. Is there a pattern? 
+Make a scatter plot of the proportion of canceled flights per day (x-axis) vs average delay per day (y-axis). 
+Use point size to represent the number of originally scheduled flights on each day. 
+Add a smoothed fitted line to your scatter plot. 
+Is the proportion of canceled flights related to the average delay?
+
+**Hint:** Group `flights` (do not use `not_canceled`) by both month and day, so that your scatter plot has 365 points in total.
+
+**INSERT_YOUR_ANSWER**
+
+(ii) Which two days had the highest flight cancellation rates?
+
+**INSERT_YOUR_ANSWER**
+
+(iii) Remove the two days with the highest flight cancellation rates and re-draw your scatter plot.
+
+**INSERT_YOUR_ANSWER**
+
+(iv) What do you think might be the main reason for these two high cancellation rates? Find out supporting evidences from the `weather` data set.
+
+**INSERT_YOUR_ANSWER**
+
+***
+
+## **Question 3 Best/worst carrier of the year**
+
+(i) Suppose we are interested in identifying the carriers with the least/worst delays. To disentangle the effects of bad airports vs. bad carriers, we can group all **non-canceled** flights by both `carrier` and `dest`, then calculate the average arrival delay for each `carrier` and `dest` pair. Make a side-by-side boxplot to compare the distribution of average arrival delay among different carriers. Flip your boxplot to have horizontal display and rank all boxes by their median values.
+
+**INSERT_YOUR_ANSWER**
+
+(ii) Which carrier had the least delays? Which carrier had the worst delays? 
+
+**INSERT_YOUR_ANSWER**
+
+(iii) Is there a small `n` problem in your data analysis? Count the number of destinations per carrier.
+
+**Hint:** Check out the `count()` function at [https://dplyr.tidyverse.org/reference/count.html](https://dplyr.tidyverse.org/reference/count.html)
+
+**INSERT_YOUR_ANSWER**
+
+(iv) Remove the carriers that only flew to one destination. Re-draw your boxplot and re-name the best/worst carriers.
+
+**INSERT_YOUR_ANSWER**
+
+***

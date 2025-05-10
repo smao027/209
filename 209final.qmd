@@ -1,0 +1,162 @@
+---
+title: "209final"
+format: pdf
+editor: visual
+---
+
+## Research Objectives
+
+### What questions are you trying to answer?
+
+Compared to traditional regression-based approaches, the use of modern machine learning techniques—such as Support Vector Machines (SVM), XGBoost, or even deep learning models like Convolutional Neural Networks (CNNs) and Transformers—has become increasingly prevalent in predictive modeling. In this final project, I aim to apply various modeling methods to healthcare data in order to systematically compare their predictive performance and interpretability, with a focus on metrics such as AUC. Specifically, the following sub-questions will be investigated:
+
+1. **Variable Contribution and Interactions**  
+   Which variables contribute most significantly to the prediction of clinical events (e.g., disease occurrence)? Are there important interaction effects between risk factors (e.g., synergistic effects such as hypertension and high BMI)?
+
+2. **Population Heterogeneity and Clustering**  
+   Do risk patterns vary across different subpopulations (e.g., by gender or age groups)? Can dimensionality reduction and clustering techniques (e.g., PCA) be employed to identify latent structures or risk profiles among patients, and further stratify them into low-, medium-, or high-risk categories?
+
+3. **Model Comparison**  
+   How do different models—from traditional statistical models to machine learning and deep learning approaches—compare in terms of training/test AUC, interpretability, and robustness? What trade-offs exist between predictive performance and model transparency?
+
+4. **Causal Inference for Lifestyle Interventions**  
+   Among modifiable variables, under what conditions should patients change certain behaviors (e.g., diet, exercise) to optimally reduce their risk of developing conditions such as diabetes? Based on model outputs, what personalized recommendations can be made to support preventive healthcare?
+
+5. **Transfer Learning for Small Sample Settings**  
+   Can large-scale models trained on extensive datasets be fine-tuned or transferred to benefit smaller datasets? Specifically, does fine-tuning pre-trained deep learning models (e.g., LLMs or domain-specific Transformers) outperform training separate models on small-sample datasets?
+
+
+
+## EDA
+
+```{r}
+library(tidyverse)   
+library(corrplot)    
+library(gridExtra)   
+```
+
+### Dataset
+
+```{r}
+diabetes_data <- read_csv("stat206/diabetes_prediction_dataset.csv")
+glimpse(diabetes_data)
+head(diabetes_data)
+```
+
+### Missing Data
+
+```{r}
+missing_values <- colSums(is.na(diabetes_data))
+print(missing_values)
+```
+
+### Analysis
+
+```{r }
+
+
+library(ggplot2)
+library(patchwork)
+
+
+
+diabetes_colors <- c("positive" = "#E41A1C", "negative" = "#377EB8")
+
+diabetes_data <- diabetes_data %>%
+     filter(gender != "Other" & hypertension!="0.5") %>%
+     mutate(diabetes = factor(
+         diabetes, 
+         levels = c(0, 1), 
+         labels = c("negative", "positive")  
+     ))
+
+# ======================
+# Modified Function: Overlaid density plots
+# ======================
+plot_univariate <- function(data, var, var_type) {
+  
+  base_plot <- ggplot(data) +
+    labs(x = NULL, y = "Density", fill = "Diabetes Status", color = "Diabetes Status") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "bottom",
+          panel.grid.minor = element_blank(),
+          plot.title = element_text(face = "bold", size = 11))
+  
+  # Numerical variables: Overlaid density plots
+  if (var_type == "numeric") {
+    p <- base_plot +
+      geom_density(
+        aes(x = .data[[var]], color = diabetes, fill = diabetes),
+        alpha = 0.3,  # Fill transparency
+        linewidth = 0.8  # Line thickness
+      ) +
+      scale_color_manual(
+        values = diabetes_colors,
+        labels = c("positive" = "Positive", "negative" = "Negative")
+      ) +
+      scale_fill_manual(
+        values = diabetes_colors,
+        labels = c("positive" = "Positive", "negative" = "Negative")
+      ) +
+      labs(title = paste("Variable:", var))
+  } 
+  
+  # Categorical variables: Stacked proportion bars (unchanged)
+  else if (var_type == "categorical") {
+    p <- data %>%
+      group_by(.data[[var]], diabetes) %>%
+      summarise(n = n(), .groups = "drop") %>%
+      group_by(.data[[var]]) %>%
+      mutate(prop = n / sum(n)) %>%
+      ggplot(aes(x = .data[[var]], y = prop, fill = diabetes)) +
+      geom_col(position = "stack", width = 0.7) +
+      geom_text(
+        aes(label = scales::percent(prop, accuracy = 1)), 
+        position = position_stack(vjust = 0.5), 
+        size = 3, color = "white"
+      ) +
+      labs(title = paste("Variable:", var)) +
+      scale_y_continuous(labels = scales::percent) +
+      scale_fill_manual(
+        values = diabetes_colors,
+        labels = c("positive" = "Positive", "negative" = "Negative")
+      ) +
+      theme_minimal(base_size = 12) +
+      theme(legend.position = "bottom",
+            panel.grid.minor = element_blank(),
+            plot.title = element_text(face = "bold", size = 11))
+  }
+  
+  return(p)
+}
+
+# ======================
+# Generate plots
+# ======================
+numeric_vars <- c("age", "bmi", "HbA1c_level", "blood_glucose_level")
+categorical_vars <- c("gender", "hypertension", "smoking_history")
+
+num_plots <- map(numeric_vars, ~ plot_univariate(diabetes_data, .x, "numeric"))
+cat_plots <- map(categorical_vars, ~ plot_univariate(diabetes_data, .x, "categorical"))
+
+# Combine numerical plots (4 variables)
+(num_plots[[1]] | num_plots[[2]]) / (num_plots[[3]] | num_plots[[4]])
+
+# Combine categorical plots (3 variables)
+wrap_plots(cat_plots, ncol = 3)
+```
+
+## Alternative Strategies / Backup Plans
+
+### 1. Interpreting Complex Models (especially deep learning)
+
+For the model comparison component, which focuses on evaluating different approaches, it is expected to proceed smoothly as this part is primarily application-based. However, for deep learning models, there is currently no universally accepted method for interpretation. To address this, we plan to review existing literature and attempt to interpret all possible results as thoroughly as possible. At the very least, we will apply model-X knockoff methods for variable selection. While this approach may not provide an unbiased estimator like traditional regression models, it can still offer some interpretative insights.
+
+### 2. Clustering and Risk Stratification May Not Be Effective
+
+Regarding the clustering analysis, I remain skeptical about whether the data will yield meaningful clusters. This heavily depends on the dataset itself. I plan to first try some traditional methods such as K-means, as well as relatively novel techniques like PCA and UMAP. If these methods do not produce clear or significant results, I will choose not to include the clustering component in the final analysis.
+
+
+### 3. Fine-Tuning Pretrained Models May Be Difficult
+
+The fine-tuning of large models is also a very interesting direction, but I do not have full confidence in its feasibility. As a first step, I plan to locally deploy and fine-tune some smaller pre-trained models. If this does not work well, my backup plan is to use the ChatGPT API for fine-tuning. Given the scale of ChatGPT, its performance after fine-tuning should not be too poor.

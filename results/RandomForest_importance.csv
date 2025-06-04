@@ -1,0 +1,18 @@
+,0
+num__HbA1c_level,0.40947447353297645
+num__blood_glucose_level,0.31685520470098655
+num__bmi,0.11867706117325875
+num__age,0.10155591200649965
+cat__hypertension_0,0.009710929476137808
+cat__hypertension_1,0.0062529071134776164
+cat__heart_disease_0,0.005395217652279994
+cat__smoking_history_never,0.004532172202313609
+cat__heart_disease_1,0.004415462039700688
+cat__smoking_history_former,0.004011881332324832
+cat__smoking_history_No Info,0.0038048284882550216
+cat__gender_Male,0.003215556246772518
+cat__smoking_history_current,0.003136940509589495
+cat__gender_Female,0.003103384924762162
+cat__smoking_history_not current,0.003010174682825447
+cat__smoking_history_ever,0.0028466031873758857
+cat__gender_Other,1.2907304633953254e-06

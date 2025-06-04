@@ -1,5 +1,6 @@
 from model import TransformerModel
 import pandas as pd
+import argparse  # Import argparse for parsing command-line arguments
 
 def process_data(file_path):
     """
@@ -33,6 +34,18 @@ def process_data(file_path):
     return data
 
 if __name__ == "__main__":
-    # Replace 'data.csv' with the actual path to your dataset
-    file_path = "data.csv"
-    processed_data = process_data(file_path)
+    # Set up argument parser
+    parser = argparse.ArgumentParser(description="Process dataset and specify model settings.")
+    parser.add_argument("--file_path", type=str, default="data.csv", help="Path to the dataset CSV file.")
+    parser.add_argument("--model", type=str, default="logistic_regression", 
+                        choices=["logistic_regression", "transformer", "svm", "random_forest"],
+                        help="Specify the model to use. Default is logistic regression.")
+    
+    # Parse arguments
+    args = parser.parse_args()
+    
+    # Process the data
+    processed_data = process_data(args.file_path)
+    
+    # Print the selected model
+    print(f"\nSelected model: {args.model}")

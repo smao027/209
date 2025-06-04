@@ -1,8 +1,8 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
-import torch
-from torch.utils.data import DataLoader, TensorDataset
+#import torch
+#from torch.utils.data import DataLoader, TensorDataset
 import numpy as np
 
 def load_data(file_path):
@@ -57,16 +57,8 @@ def preprocess_data(data, as_tensor=True, test_size=0.2):
     # Split the data into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
 
-    if as_tensor:
-        # Convert to PyTorch tensors
-        X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
-        X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
-        y_train_tensor = torch.tensor(y_train.values, dtype=torch.long)
-        y_test_tensor = torch.tensor(y_test.values, dtype=torch.long)
-        return (X_train_tensor, y_train_tensor), (X_test_tensor, y_test_tensor)
-    else:
-        # Return as numpy arrays
-        return (X_train, y_train.values), (X_test, y_test.values)
+
+    return (X_train, y_train.values), (X_test, y_test.values)
 
 def create_dataloaders(train_data, test_data, batch_size=32):
     """
@@ -84,11 +76,4 @@ def create_dataloaders(train_data, test_data, batch_size=32):
     X_test, y_test = test_data
 
     # Create TensorDatasets
-    train_dataset = TensorDataset(X_train, y_train)
-    test_dataset = TensorDataset(X_test, y_test)
 
-    # Create DataLoaders
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
-
-    return train_loader, test_loader

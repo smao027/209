@@ -101,3 +101,35 @@ class random_forest(nn.Module):
         :return: Predicted probability tensor of shape (batch_size, 2)
         """
         return self.forward(x)
+
+class ResNetBlock(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super(ResNetBlock, self).__init__()
+        self.fc1 = nn.Linear(input_dim, output_dim)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(output_dim, output_dim)
+
+    def forward(self, x):
+        residual = x
+        out = self.fc1(x)
+        out = self.relu(out)
+        out = self.fc2(out)
+        out += residual  # Add the residual connection
+        out = self.relu(out)
+        return out
+
+class ResNetModel(nn.Module):
+    def __init__(self, input_dim, output_dim, num_blocks=3):
+        super(ResNetModel, self).__init__()
+        self.input_dim = input_dim
+        self.output_dim = output_dim
+        self.blocks = nn.ModuleList([ResNetBlock(input_dim if i == 0 else output_dim, output_dim) for i in range(num_blocks)])
+        self.fc = nn.Linear(output_dim, 1)  # Fully connected layer for binary classification (diabetes: 0 or 1)
+        
+
+    def forward(self, x):
+        for block in self.blocks:
+            x = block(x)
+        x = self.fc(x)
+        probabilities = torch.sigmoid(x) 
+        return probabilities

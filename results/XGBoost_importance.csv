@@ -1,0 +1,18 @@
+,0
+num__HbA1c_level,0.5249376
+num__blood_glucose_level,0.25411537
+cat__heart_disease_0,0.036093164
+cat__hypertension_0,0.029175151
+cat__gender_Male,0.02849145
+cat__smoking_history_No Info,0.027718578
+num__age,0.026637727
+num__bmi,0.015480428
+cat__smoking_history_not current,0.011033798
+cat__smoking_history_never,0.010230634
+cat__gender_Female,0.009867731
+cat__smoking_history_current,0.008985908
+cat__smoking_history_ever,0.0089772465
+cat__smoking_history_former,0.008255267
+cat__hypertension_1,0.0
+cat__gender_Other,0.0
+cat__heart_disease_1,0.0
